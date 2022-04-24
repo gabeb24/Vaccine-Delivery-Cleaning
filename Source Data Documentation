@@ -1,0 +1,18 @@
+Based on the client needs for this dashboard, all data sources were required to include: The date that doses were delivered and the vaccine manufacturer.
+Due to these requirements there are several sources that could not be used because the datasets either did not include the date or the vaccine manufacturer.
+
+As of April 24, 2022 these are all the sources that satisfied our requirements. 
+European Union: https://qap.ecdc.europa.eu/public/extensions/COVID-19/vaccine-tracker.html#distribution-tab
+USA: https://data.cdc.gov/Vaccinations/COVID-19-Vaccinations-in-the-United-States-Jurisdi/unsk-b7fc
+Chile: https://github.com/MinCiencia/Datos-COVID19
+Colombia: https://www.datos.gov.co/Salud-y-Protecci-n-Social/Asignaci-n-de-dosis-de-vacuna-contra-COVID-19/sdvb-4x4j
+Malaysia: https://raw.githubusercontent.com/CITF-Malaysia/citf-public/main/vaccination/vax_malaysia.csv
+Ecuador: https://raw.githubusercontent.com/andrab/ecuacovid/master/datos_crudos/vacunas/arribos_fabricantes_por_mes.csv
+Switzerland: https://opendata.swiss/en/dataset/covid-19-schweiz/resource/d52e637f-8392-4dc1-b210-2f7fa5f6d89f
+Bangladesh: http://103.247.238.92/webportal/pages/covid19-vaccination-update.php#
+Argentina, Hong Kong, South Korea, South Africa, Ukraine: https://github.com/owid/covid-19-data/blob/master/public/data/vaccinations/locations-manufacturer.csv
+Japan: https://www.kantei.go.jp/jp/headline/kansensho/vaccine.html
+India: https://data.covid19india.org/ (source stopped updating after October 2021)
+
+Unfortunately due to unavailable web API's or changing source urls, the ETL pipelines for the following sources could not be automated to update twice daily:
+Bangladesh, Switzerland
