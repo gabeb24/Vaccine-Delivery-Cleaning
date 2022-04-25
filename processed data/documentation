@@ -1,0 +1,82 @@
+### Pyramid Analytics data processing
+All files are output to a sql database that houses this 'semi-processed data'.
+You can view what the outputs look like as excel files in this folder.
+
+1. European Union Source:
+  Since this source uses ISO 2 codes as opposed to the more universal ISO 3 codes, we use an excel file ISO Code Reference.xlsx and inner join to add the ISO 3 codes to
+  the file
+
+2. USA Source:
+  Pyramid Analytics has a 'Time Intelligence' function that allows you to convert a date variable that might contain a date like "2022-04-21" to "2022-04-01" or "Apr 2022".
+  The SQL equivalent of this function is: DATEADD(day, 1, EOMONTH([old_date], -1)) AS [new_date] to convert to the first day of each month.
+  The SQL equivalent of coverting a date variable to "Apr 2022" is CONCAT(FORMAT([old_date], 'MMM'), SPACE(1), DATEPART(year, [old_date])) AS [Month]
+  As a reminder, the required data structure is to standardize the format of the data into monthly totals as opposed to running totals or 'cumulative sums'.
+  
+3. Chile Source: No pre-processing in Pyramid Analytics
+
+4. Colombia Source:
+  Translating columns names: Fecha_Resolucion > vaccination_date
+  Laboratorio_Vacuna > vaccine_manufacturer
+  Cantidad> quantity
+
+5. Malaysia Source: No pre-processing in Pyramid Analytics
+
+6. Ecuador Source: No pre-processing in Pyramid Analytics
+
+7. Switzerland Source:
+  Same date conversion function as the USA Source above. 
+
+8. Bangladesh Source: There are 3 files from this source that all must be downloaded separately. 
+  -On the source's website we select all Divisions, Districts and set the 'Period start' to December 1, 2020 and 'Period End' to the present date
+  -We download the XLS files for 'All vaccine 1st dose administered overtime', 'All vaccine 1st dose administered overtime', & 'All vaccine 3rd dose administered overtime'
+  -open each of the 3 files, delete the first row of the table, and save as xlsx or csv
+  -files are then uploaded to pyramid analytics
+  -Use the same Time Intelligence function to get the desired date format
+  - group by the month and take the sum of the columns for all 6 manufacturers
+  - for the first dose file rename the manufacturer columns to 'manufacturer name First' ex: 'Pfizer First'
+  - For the second and 3rd dose files repeat the previous 3 steps but rename the columns 'manufacturer name second' or 'manufacturer name third'
+  - Left Join the 'First Dose' & 'Second Dose' tables by the 'Month' (you could use a union instead)
+  - Left Join the output of the above step to the 'Third Dose' table
+
+9. Argentina, Hong Kong, South Korea, South Africa, Ukraine Source:
+  - left join the source table with https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/vaccinations/vaccinations.csv to pull in the necessary ISO3 codes
+  - Use the Time Intelligence function
+  - Group by iso_code, location, date, month, vaccine, and take the Max of the total_vaccinations column
+  - Rename: iso_code > ISO, location > Recipient, date > Delivery Date, total_vaccinations > Doses Administered
+  - filter out any rows where the 'Month' column is blank
+ 
+10. Japan Source: The ETL process for this table is more complex since it uses an excel file with multiple sheets that represent differnt 'groups' of people that are vaccinated
+  - Select the sheet 一般接種 - General Population in English
+  - filter out the rows in the first column that say 'これまでのワクチン総接種回数（一般接種（高齢者含む））', '　接種日', '合計', and blank ones.
+  - Translate the columns:
+    Column1 > Delivery Date
+    Column 4 > pfizer_first, Column5 > moderna_first, Column6 > az_frist, Column7 > pfizer_second, Column8 > moderna_second, Column9 > az_second, Column10 > exclude
+  - Use Time Intelligence function on Delivery Date
+  - Group by the Delivery Date and take the sum of all other columns
+  - Select the Sheet '医療従事者等' - Medical in English
+  - Filter out the same rows in Column1 as the first sheet, but add '注：ワクチン接種円滑化システム（V-SYS）への報告（17時時点）を集計（高齢者、基礎疾患保有者、その他を除く）。',
+  '　　土日祝日については、次の平日分に合わせて計上。', '　　7月26日・27日の実績において、医療従事者等向け優先接種の接種実績は、兵庫県、沖縄県の接種実績のみ集計し、それ以降の公表においては全都道府県の集計を終了。'
+  '　　高齢者施設等従事者向け優先接種の接種実績は、７月30日時点までの実績を集計し、全都道府県の集計を終了。', '　　4月12日は厚生労働省の「新型コロナワクチン接種実績」の4月9日までの総接種回数との差分を計上。'
+  '　　4月9日までの接種実績は厚生労働省の「新型コロナワクチン接種実績」のページをご覧ください。', '　　https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/vaccine_sesshujisseki.html'
+  to the filter. 
+  -Rename Column1 > Delivery Date, Column4 > pfizer_first, Column5 > 'moderna_first', Column6 > 'pfizer_second', Column7 > 'moderna_second'
+  - Use Time Intelligence function on Delivery Date
+  - Group by Delivery Date and take the sum of each the columns that were renamed above.
+  - Left Join The Gen Pop and Medical tables using the Delivery Date to join
+Japan 3rd dose table
+  - Select the Gen Pop table: 一般接種
+  - filter out the rows in the first column that say 'これまでのワクチン総接種回数（一般接種（高齢者含む））', '　接種日', '合計', and blank ones.
+  - Use Time Intelligence function on Column 1 and rename it to Delivery Date
+  - Rename Column4 > pfizer_third, Column5 > moderna_third
+  - Group by delivery date and take the sum of the columns we renamed above
+  
+ 
+11. India Source:
+  - Use a Python source in Pyramid with the following code to solve file encoding issues:
+    import os, ssl
+    import pandas as pd
+    if (not os.environ.get('PYTHONHTTPSVERIFY', '') and getattr(ssl, '_create_unverified_context', None)):
+      ssl._create_default_https_context = ssl._create_unverified_context
+    outputDF = pd.read_csv('http://data.covid19india.org/csv/latest/cowin_vaccine_data_statewise.csv')
+  - Use Time Intelligence Function on the 'Update On' column
+
