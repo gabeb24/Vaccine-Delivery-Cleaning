@@ -14,5 +14,6 @@ Argentina, Hong Kong, South Korea, South Africa, Ukraine: https://github.com/owi
 Japan: https://www.kantei.go.jp/jp/headline/kansensho/vaccine.html
 India: https://data.covid19india.org/ (source stopped updating after October 2021)
 
-Unfortunately due to unavailable web API's or changing source urls, the ETL pipelines for the following sources could not be automated to update twice daily:
+Unfortunately due to unavailable web API's or changing source urls, the ETL pipelines for the following sources could not be automated to update twice daily,
+so new excel files are downloaded and uploaded to the data pipeline intern:
 Bangladesh, Switzerland
