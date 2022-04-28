@@ -201,9 +201,3 @@ INTO ref.[EU Delivery_2]
 FROM union_dnk AS t2
 LEFT JOIN ref.[Country Names] AS c
 ON t2.[ISO] = c.[ISO]
-
-
-
-SELECT *
-FROM raw.[EU Delivery]
-WHERE ISO = 'DNK'
