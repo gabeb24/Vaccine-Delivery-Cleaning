@@ -34,6 +34,7 @@ temp_table2 AS (
 SELECT 'BGD' AS [ISO], 'Bangladesh' AS [Recipient], 274 AS [CountryID], [Month], [Delivery Date], [Vaccine ID], CAST(ROUND(([Doses Delivered]*1.10), 0) AS int) AS [Doses Delivered],
 'http://103.247.238.92/webportal/pages/covid19-vaccination-update.php#' AS [Delivery Source],
 'Commercial' AS [Delivery Type]
+INTO ref.[Bangladesh Delivery]
 FROM temp_table2
 UNPIVOT (
 	[Doses Delivered]
