@@ -1,6 +1,6 @@
-IF OBJECT_ID('ref.[EU Delivery_2]') IS NOT NULL 
+IF OBJECT_ID('ref.[EU Delivery]') IS NOT NULL 
 BEGIN 
-	DROP TABLE ref.[EU Delivery_2]
+	DROP TABLE ref.[EU Delivery]
 END
  
 
@@ -197,7 +197,7 @@ CASE
 	THEN 0
 	ELSE [Doses Delivered] END AS [Doses Delivered], 
 t2.[Delivery Source], 'Commercial' AS [Delivery Type]
-INTO ref.[EU Delivery_2]
+INTO ref.[EU Delivery]
 FROM union_dnk AS t2
 LEFT JOIN ref.[Country Names] AS c
 ON t2.[ISO] = c.[ISO]
